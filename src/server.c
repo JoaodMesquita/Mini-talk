@@ -6,19 +6,13 @@
 /*   By: joapedro <joapedro@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:32:32 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/15 10:38:27 by joapedro         ###   ########.fr       */
+/*   Updated: 2025/09/17 14:44:45 by joapedro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mini_talk.h"
 
-int	main(int ac, char **av)
+int	main()
 {
-	(void)av;
-	if (ac != 3)
-	{
-		ft_printf("Error\n");
-		return(0);
-	}
-
+	
 }
