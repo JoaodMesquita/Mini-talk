@@ -6,13 +6,13 @@
 /*   By: joapedro <joapedro@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:29:12 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/18 10:10:55 by joapedro         ###   ########.fr       */
+/*   Updated: 2025/09/18 16:08:15 by joapedro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mini_talk.h"
 
-int	error_handler(pid_t pid)
+static int	error_handler(pid_t pid)
 {
 	if (pid > PID_MAX || pid < 0)
 		return (ft_putstr_fd("Error:\nInvalid PID!\n", 2), 1);
@@ -21,32 +21,30 @@ int	error_handler(pid_t pid)
 	else
 		return (0);
 }
-/* void	bit_sender(pid_t pid, int bit)
-{
-	if (bit == 1)
-		kill(pid, SIGUSR1);
-	if (bit == 0)
-		kill(pid, SIGUSR2);
-} */
-void	message_to_bits(pid_t pid, char *message)
+
+static void	message_to_bits(pid_t pid, char *message)
 {
 	int		i;
 	int		j;
 	int		bit;
+	int		len;
 
+	len = 0;
+	while (message[len])
+		len++;
+	len++;
 	i = 0;
-	while(message[i])
+	while(len--)
 	{
 		j = 7;
 		while (j >= 0)
 		{
 				bit = (message[i] >> j) & 1;
-				ft_printf("%d", bit);
 				if (bit == 1)
 					kill(pid, SIGUSR1);
-				else 
+				else
 					kill(pid, SIGUSR2);
-				//bit_sender(pid, bit);
+				usleep(175);
 			j--;
 		}
 		i++;
