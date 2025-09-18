@@ -6,18 +6,18 @@
 /*   By: jpmesquita <jpmesquita@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:29:12 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/18 19:05:54 by jpmesquita       ###   ########.fr       */
+/*   Updated: 2025/09/18 23:22:07 by jpmesquita       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mini_talk.h"
 
-static volatile int	ack_confirm = 0;
+static volatile int	g_ack_confirm = 0;
 
 static void	ack_handler(int sig)
 {
 	(void)sig;
-	ack_confirm = 1;
+	g_ack_confirm = 1;
 }
 
 static int	error_handler(pid_t pid)
@@ -28,6 +28,14 @@ static int	error_handler(pid_t pid)
 		return (ft_putstr_fd("Error:\nKernel PID!\n", 2), 1);
 	else
 		return (0);
+}
+
+void	send_bit(pid_t pid, int bit)
+{
+	if (bit == 1)
+		kill(pid, SIGUSR1);
+	else
+		kill(pid, SIGUSR2);
 }
 
 static void	message_to_bits(pid_t pid, char *message)
@@ -42,34 +50,31 @@ static void	message_to_bits(pid_t pid, char *message)
 		len++;
 	len++;
 	i = 0;
-	while(len--)
+	while (len--)
 	{
 		j = 7;
 		while (j >= 0)
 		{
-				bit = (message[i] >> j) & 1;
-				if (bit == 1)
-					kill(pid, SIGUSR1);
-				else
-					kill(pid, SIGUSR2);
-				while (!ack_confirm)
-					usleep(100);
-				ack_confirm = 0;
+			bit = (message[i] >> j) & 1;
+			send_bit(pid, bit);
+			while (!g_ack_confirm)
+				usleep(100);
+			g_ack_confirm = 0;
 			j--;
 		}
 		i++;
 	}
-} 
+}
 
-int	main (int ac, char **av)
+int	main(int ac, char **av)
 {
-	pid_t	pid;
-	char	*message;
-	struct	sigaction sa;
-	
+	pid_t				pid;
+	char				*message;
+	struct sigaction	sa;
+
 	if (ac != 3)
 	{
-		ft_printf("Error:\nMust have PID and message\n");
+		ft_printf("Error:\nInsert ./client <PID> followed by <Message>\n");
 		exit(1);
 	}
 	pid = ft_atoi(av[1]);
