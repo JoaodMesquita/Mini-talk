@@ -6,7 +6,7 @@
 /*   By: joapedro <joapedro@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:29:12 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/17 14:59:30 by joapedro         ###   ########.fr       */
+/*   Updated: 2025/09/18 10:10:55 by joapedro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ int	error_handler(pid_t pid)
 	else
 		return (0);
 }
-void	bit_sender(pid_t pid, int bit)
+/* void	bit_sender(pid_t pid, int bit)
 {
-	if (bit == 0)
-		kill(pid, SIGUSR1);
 	if (bit == 1)
+		kill(pid, SIGUSR1);
+	if (bit == 0)
 		kill(pid, SIGUSR2);
-}
+} */
 void	message_to_bits(pid_t pid, char *message)
 {
 	int		i;
@@ -41,7 +41,12 @@ void	message_to_bits(pid_t pid, char *message)
 		while (j >= 0)
 		{
 				bit = (message[i] >> j) & 1;
-				bit_sender(pid, bit);
+				ft_printf("%d", bit);
+				if (bit == 1)
+					kill(pid, SIGUSR1);
+				else 
+					kill(pid, SIGUSR2);
+				//bit_sender(pid, bit);
 			j--;
 		}
 		i++;
@@ -54,10 +59,13 @@ int	main (int ac, char **av)
 	char	*message;
 
 	if (ac != 3)
-		return (ft_putstr_fd("Error:\nMust have PID and message\n", 2), 1);
+	{
+		ft_printf("Error:\nMust have PID and message\n");
+		exit(1);
+	}
 	pid = ft_atoi(av[1]);
 	message = av[2];
-	if(error_handler(pid))
+	if (error_handler(pid))
 		exit(1);
 	message_to_bits(pid, message);
 }
