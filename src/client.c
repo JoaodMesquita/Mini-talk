@@ -3,14 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joapedro <joapedro@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: jpmesquita <jpmesquita@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:29:12 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/18 16:08:15 by joapedro         ###   ########.fr       */
+/*   Updated: 2025/09/18 19:05:54 by jpmesquita       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mini_talk.h"
+
+static volatile int	ack_confirm = 0;
+
+static void	ack_handler(int sig)
+{
+	(void)sig;
+	ack_confirm = 1;
+}
 
 static int	error_handler(pid_t pid)
 {
@@ -44,7 +52,9 @@ static void	message_to_bits(pid_t pid, char *message)
 					kill(pid, SIGUSR1);
 				else
 					kill(pid, SIGUSR2);
-				usleep(175);
+				while (!ack_confirm)
+					usleep(100);
+				ack_confirm = 0;
 			j--;
 		}
 		i++;
@@ -55,7 +65,8 @@ int	main (int ac, char **av)
 {
 	pid_t	pid;
 	char	*message;
-
+	struct	sigaction sa;
+	
 	if (ac != 3)
 	{
 		ft_printf("Error:\nMust have PID and message\n");
@@ -65,5 +76,9 @@ int	main (int ac, char **av)
 	message = av[2];
 	if (error_handler(pid))
 		exit(1);
+	sa.sa_handler = ack_handler;
+	sa.sa_flags = 0;
+	sigemptyset(&sa.sa_mask);
+	sigaction(SIGUSR1, &sa, NULL);
 	message_to_bits(pid, message);
 }
