@@ -6,20 +6,20 @@
 /*   By: jpmesquita <jpmesquita@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:32:32 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/18 23:19:41 by jpmesquita       ###   ########.fr       */
+/*   Updated: 2025/09/21 23:31:08 by jpmesquita       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mini_talk.h"
 
-void	signal_handler(int sig, siginfo_t *info, void *context)
+void	signal_handler(int signum, siginfo_t *info, void *context)
 {
 	static char	letter;
 	static int	bit_counter;
 
 	(void)context;
 	letter = letter << 1;
-	if (sig == SIGUSR1)
+	if (signum == SIGUSR1)
 		letter = letter | 1;
 	bit_counter++;
 	if (bit_counter == 8)
@@ -32,6 +32,7 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 		bit_counter = 0;
 	}
 	kill(info->si_pid, SIGUSR1);
+	
 }
 
 int	main(void)
