@@ -6,7 +6,7 @@
 /*   By: jpmesquita <jpmesquita@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:29:12 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/21 23:31:44 by jpmesquita       ###   ########.fr       */
+/*   Updated: 2025/09/25 12:32:17 by jpmesquita       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,40 +30,42 @@ static int	error_handler(pid_t pid)
 		return (0);
 }
 
-void	send_bit(pid_t pid, int bit)
+void	ack_aknowledge(int sig)
 {
-	if (bit == 1)
-		kill(pid, SIGUSR1);
-	else
-		kill(pid, SIGUSR2);
+	if (sig ==  SIGUSR2)
+		ft_printf("\nMessage sent successfuly! 😀\n");
 }
 
-static void	message_to_bits(pid_t pid, char *message)
+static int	message_to_bits(pid_t pid, char *message, int len)
 {
 	int		i;
 	int		j;
 	int		bit;
-	int		len;
 
-	len = 0;
-	while (message[len])
-		len++;
-	len++;
-	i = 0;
 	while (len--)
 	{
 		j = 7;
 		while (j >= 0)
 		{
 			bit = (message[i] >> j) & 1;
-			send_bit(pid, bit);
+			if (bit == 1)
+			{
+				if(kill(pid, SIGUSR1) == -1)
+					return(write(2, "Message was not sent\n", 21), 0);
+			}
+			else
+			{
+				if(kill(pid, SIGUSR2) == -1)
+					return(write(2, "Message was not sent\n", 21), 0);
+			}
 			while (!g_ack_confirm)
-				usleep(100);
+				pause();
 			g_ack_confirm = 0;
 			j--;
 		}
 		i++;
 	}
+	return (1);
 }
 
 int	main(int ac, char **av)
@@ -85,5 +87,7 @@ int	main(int ac, char **av)
 	sa.sa_flags = 0;
 	sigemptyset(&sa.sa_mask);
 	sigaction(SIGUSR1, &sa, NULL);
-	message_to_bits(pid, message);
+	signal(SIGUSR2, ack_aknowledge);
+	if (!message_to_bits(pid, message, ft_strlen(message) + 1))
+		exit(1);
 }

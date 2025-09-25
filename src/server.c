@@ -6,7 +6,7 @@
 /*   By: jpmesquita <jpmesquita@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 10:32:32 by joapedro          #+#    #+#             */
-/*   Updated: 2025/09/21 23:31:08 by jpmesquita       ###   ########.fr       */
+/*   Updated: 2025/09/23 16:11:04 by jpmesquita       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@ void	signal_handler(int signum, siginfo_t *info, void *context)
 	if (bit_counter == 8)
 	{
 		if (letter == '\0')
+		{
 			write(1, "\n", 1);
+			kill(info->si_pid, SIGUSR2);
+		}
 		else
 			write(1, &letter, 1);
 		letter = 0;
