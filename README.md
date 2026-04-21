@@ -28,7 +28,7 @@ This project helps develop a deeper understanding of:
 Clone the repository and compile the project:
 
 ```bash
-git clone <git@github.com:JoaodMesquita/Mini-talk.git>
+git clone git@github.com:JoaodMesquita/Mini-talk.git
 cd minitalk
 make
 ```
